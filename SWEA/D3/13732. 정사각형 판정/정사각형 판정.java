@@ -6,11 +6,9 @@ public class Solution {
     private static final char blocked = '#';
 
     private static int n;
-    private static double max;
+    private static int len;
+    private static String result;
     private static char[][] board;
-    private static boolean flag;
-    private static int[] dx = {-1, 0, 1, 0};
-    private static int[] dy = {0, 1, 0, -1};
 
     public static void main(String args[]) throws Exception {
         Scanner sc = new Scanner(System.in);
@@ -26,51 +24,52 @@ public class Solution {
                 String input = sc.next();
                 board[i] = input.toCharArray();
             }
+            len = 0;
+            result = "yes";
+            boolean first = true;
+            int first_x = 0, first_y = 0;
 
-            String result = "no";
-            max = 0;
-            flag = false;
-            boolean check = false;
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                    if (flag && board[i][j] == blocked) {
-                        check = true;
-                        break;
+                    if (board[i][j] == blocked && first) {
+                        first_x = i;
+                        first_y = j;
+                        first = false;
                     }
-                    dfs(i, j);
-                }
-                if (flag && check) {
-                    break;
-                }
-            }
-
-            if (!check) {
-                if (Math.sqrt(max) % 1 == 0.0 && max != 0) {
-                    result = "yes";
+                    if (board[i][j] == blocked) {
+                        if (j == first_y) {
+                            j = right(i, j);
+                        } else {
+                            result = "no";
+                        }
+                    }
+                    if (board[i][j] == blocked && ((i + 1 < n && board[i + 1][j] == empty) || i == n - 1)) {
+                        if (i - first_x + 1 != len) {
+                            result = "no";
+                        }
+                    }
                 }
             }
 
             System.out.println("#" + test_case + " " + result);
-
         }
     }
 
-    private static void dfs(int x, int y) {
-        if (board[x][y] == empty) {
-            return;
-        }
-
-        board[x][y] = empty;
-        max++;
-        flag = true;
-        for (int i = 0; i < 4; i++) {
-            int nx = dx[i] + x;
-            int ny = dy[i] + y;
-
-            if (0 <= nx && nx < n && 0 <= ny && ny < n && board[nx][ny] == blocked) {
-                dfs(nx, ny);
+    private static int right(int x, int y) {
+        //오른쪽으로 감
+        int i;
+        for (i = y + 1; i < n; i++) {
+            if (board[x][i] == empty) {
+                break;
             }
         }
 
+        //길이를 구함
+        if (len == 0) {
+            len = i - y;
+        } else if (len != i - y) {
+            result = "no";
+        }
+        return i - 1;
     }
 }
