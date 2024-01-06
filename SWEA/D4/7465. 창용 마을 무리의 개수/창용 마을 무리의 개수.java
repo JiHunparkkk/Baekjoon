@@ -1,8 +1,10 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 class Solution {
 
-    public static int[] parent;
+    public static ArrayList<Integer>[] list;
+    public static boolean[] visited;
 
     public static void main(String args[]) throws Exception {
 
@@ -16,43 +18,41 @@ class Solution {
             n = sc.nextInt();
             m = sc.nextInt();
 
-            parent = new int[n + 1];
-            for (int i = 1; i < n + 1; i++) {
-                parent[i] = i;
+            list = new ArrayList[n + 1];
+            visited = new boolean[n + 1];
+
+            for (int i = 1; i <= n; i++) {
+                list[i] = new ArrayList<>();
             }
 
             for (int i = 0; i < m; i++) {
                 int a = sc.nextInt();
                 int b = sc.nextInt();
 
-                union(a, b);
+                list[a].add(b);
+                list[b].add(a);
             }
 
-            for (int i = 1; i < n + 1; i++) {
-                if (i == parent[i]) {
-                    answer++;
+            for (int i = 1; i <= n; i++) {
+                if (visited[i]) {
+                    continue;
                 }
+                dfs(i);
+                answer++;
             }
 
             System.out.println("#" + test_case + " " + answer);
         }
     }
 
-    public static void union(int a, int b) {
-        a = find(a);
-        b = find(b);
+    public static void dfs(int x) {
+        visited[x] = true;
 
-        if (a < b) {
-            parent[b] = a;
-        } else {
-            parent[a] = b;
+        for (Integer num : list[x]) {
+            if (visited[num]) {
+                continue;
+            }
+            dfs(num);
         }
-    }
-
-    public static int find(int x) {
-        if (x == parent[x]) {
-            return x;
-        }
-        return find(parent[x]);
     }
 }
