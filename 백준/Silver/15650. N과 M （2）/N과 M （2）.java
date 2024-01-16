@@ -19,17 +19,12 @@ public class Main {
         arr = new int[n];
         visited = new int[n];
 
-        dfs(0);
+        dfs(0, 0);
         System.out.println(sb);
     }
 
-    private static void dfs(int depth) {
+    private static void dfs(int depth, int start) {
         if (depth == m) {
-            for (int i = 0; i < m; i++) {
-                if (i < m - 1 && arr[i] > arr[i + 1]) {
-                    return;
-                }
-            }
             for (int i = 0; i < m; i++) {
                 sb.append(arr[i] + " ");
             }
@@ -37,11 +32,11 @@ public class Main {
             return;
         }
 
-        for (int i = 0; i < n; i++) {
+        for (int i = start; i < n; i++) {
             if (visited[i] == 0) {
                 visited[i] = 1;
                 arr[depth] = i + 1;
-                dfs(depth + 1);
+                dfs(depth + 1, i + 1);
                 visited[i] = 0;
             }
         }
