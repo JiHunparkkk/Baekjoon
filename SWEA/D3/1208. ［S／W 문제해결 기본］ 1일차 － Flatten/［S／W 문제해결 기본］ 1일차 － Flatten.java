@@ -2,53 +2,45 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Solution {
-    public static void main(String args[]) throws Exception {
-
-        Scanner sc = new Scanner(System.in);
-        int T = 10;
-
-        for (int test_case = 1; test_case <= T; test_case++) {
-            int n = sc.nextInt();
-            int[] arr = new int[100];
-
-            for (int i = 0; i < 100; i++) {
-                arr[i] = sc.nextInt();
-            }
-
-            Arrays.sort(arr);
-
-            for (int i = 0; i < n; i++) {
-                flat(arr);
-            }
-
-            System.out.println("#" + test_case + " " + (arr[99] - arr[0]));
-        }
-    }
-
-    private static void flat(int[] arr) {
-        arr[0] += 1;
-        arr[99] -= 1;
-
-        for (int i = 0; i < 99; i++) {
-            if (arr[i] > arr[i + 1]) {
-                change(arr, i, i + 1);
-            } else {
-                break;
-            }
-        }
-
-        for (int i = 99; i >= 0; i--) {
-            if (arr[i] < arr[i - 1]) {
-                change(arr, i, i - 1);
-            } else {
-                break;
-            }
-        }
-    }
-
-    private static void change(int[] arr, int a, int b) {
-        int tmp = arr[a];
-        arr[a] = arr[b];
-        arr[b] = tmp;
-    }
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+        
+		int T = 10;
+		
+		for(int test_case = 1 ; test_case<=T ; test_case++) {
+			int n = sc.nextInt();
+			int[] box = new int[100];
+			
+			for(int i=0;i<100;i++) {
+				box[i] = sc.nextInt();
+			}
+			
+			Arrays.sort(box);
+			
+			for(int i=0;i<n;i++) {
+				box[0]+=1;
+				box[99]-=1;
+				
+				int j=1,k=0;
+				while(box[k]>box[j]) {
+					change(box, j++, k++);
+				}
+				
+				j=98;
+				k=99;
+				while(box[k]<box[j]) {
+					change(box, j--, k--);
+				}
+			}
+			
+			int answer = box[99] - box[0];
+			System.out.println("#"+test_case+" " + answer);
+		}
+	}
+	
+	private static void  change(int[] arr, int i, int j) {
+		int tmp = arr[i];
+		arr[i] = arr[j];
+		arr[j] = tmp;
+	}
 }
