@@ -1,67 +1,57 @@
 import java.util.Scanner;
 
-class Solution {
+public class Solution {
+	
+	private static int[] dx = {0,1,0,-1};
+	private static int[] dy = {1,0,-1,0};
+	private static int[][] board;
+	private static boolean[][] visited;
+	private static int n;
+	
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		
+		int t = sc.nextInt();
+		
+		for(int test_case = 1 ; test_case<=t;test_case++) {
+			n = sc.nextInt();
+			
+			board = new int[n][n];
+			visited = new boolean[n][n];
+			
+			visited[0][0] = true;
+			board[0][0] = 1 ;
+			
+			move(0, 0, dx[0],dy[0], 2);
+			
+			System.out.println("#"+test_case);
+			for(int[] arr : board) {
+				for(int num : arr) {
+					System.out.print(num+" ");
+				}
+				System.out.println();
+			}
+		}
+	}
 
-    static int[] dx = {1, 0, -1, 0};    //우,하,좌,상
-    static int[] dy = {0, 1, 0, -1};
-    static int[][] board;
-
-    public static void main(String args[]) throws Exception {
-
-        Scanner sc = new Scanner(System.in);
-        int T;
-        T = sc.nextInt();
-
-        for (int test_case = 1; test_case <= T; test_case++) {
-            int N;
-            N = sc.nextInt();
-
-            board = new int[N][N];
-
-            System.out.println("#" + test_case);
-            board[0][0] = 1;
-            solution(N, 0, 0, false);
-            printResult(N);
-        }
-    }
-
-
-    private static void solution(int N, int xIndex, int yIndex, boolean flag) {
-        for (int i = 0; i < 4; i++) {
-            int x = dx[i] + xIndex;
-            int y = dy[i] + yIndex;
-
-            if (i == 3) {
-                flag = true;
-            }
-
-            if (flag) {
-                int tx = dx[3] + xIndex;
-                int ty = dy[3] + yIndex;
-
-                if (tx >= 0 && ty >= 0 && tx < N && ty < N && board[ty][tx] == 0) {
-                    board[ty][tx] += board[yIndex][xIndex] + 1;
-                    solution(N, tx, ty, flag);
-                    break;
-                } else {
-                    flag = !flag;
-                }
-            }
-
-            if (x >= 0 && y >= 0 && x < N && y < N && board[y][x] == 0) {
-                board[y][x] += board[yIndex][xIndex] + 1;
-                solution(N, x, y, flag);
-                break;
-            }
-        }
-    }
-
-    private static void printResult(int N) {
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                System.out.print(board[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
+	
+	private static void move(int x,int y,int ddx,int ddy,int num) {
+				
+		for(int i=0;i<5;i++) {
+			int nx = x + ddx;
+			int ny = y + ddy;
+			
+			if(nx>=0 && ny>=0 && nx<n && ny<n && !visited[nx][ny]) {
+				visited[nx][ny] = true;
+				board[nx][ny] = num;
+				move(nx, ny,ddx,ddy, num+1);
+				break;
+			}
+			if(i!=4) {				
+				ddx = dx[i];
+				ddy = dy[i];	
+			}
+		}
+		
+	}
 }
