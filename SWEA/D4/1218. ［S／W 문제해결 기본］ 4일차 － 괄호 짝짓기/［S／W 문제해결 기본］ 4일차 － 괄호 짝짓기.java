@@ -1,7 +1,7 @@
 import java.util.Scanner;
 import java.util.Stack;
 
-public class Solution {
+public class Solution{
 	public static void main(String[] args) {
 		
 		Scanner sc = new Scanner(System.in);
@@ -24,6 +24,10 @@ public class Solution {
 						break;
 					}
 				}
+			}
+			
+			if(!stack.isEmpty()) {
+				answer=0;
 			}
 			
 			System.out.println("#"+test_case+" "+answer);
