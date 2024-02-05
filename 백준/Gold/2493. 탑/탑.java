@@ -11,25 +11,20 @@ public class Main {
 		StringTokenizer st;
 		
 		int n = Integer.parseInt(br.readLine());
-		Stack<Point> stack = new Stack<>();
-		Stack<Point> empty = new Stack<>();
+		Stack<Integer> stack = new Stack<>();
 		int[] answer = new int[n];
+		int[] arr = new int[n];
 		
 		st = new StringTokenizer(br.readLine());
-		
 		for(int i=0;i<n;i++) {
-			stack.add(new Point(i,Integer.parseInt(st.nextToken())));
+			arr[i] = Integer.parseInt(st.nextToken());
 		}
 		
-		while(!stack.isEmpty()) {			
-			empty.add(stack.pop());
+		for(int i=n-1;i>0;i--) {
+			int index = stack.push(i);
 			
-			while(!empty.isEmpty() && !stack.isEmpty() && stack.peek().height < empty.peek().height) {
-				empty.add(stack.pop());
-			}
-			while(!empty.isEmpty() && !stack.isEmpty() && stack.peek().height > empty.peek().height) {
-				Point pop = empty.pop();
-				answer[pop.index] = stack.peek().index+1;
+			while(!stack.isEmpty() && arr[index-1] > arr[stack.peek()]) {
+				answer[stack.pop()] = index;
 			}
 		}
 		
@@ -39,15 +34,5 @@ public class Main {
 		System.out.println(sb);
 		
 		br.close();
-	}
-}
-
-class Point{
-	int index;
-	int height;
-	
-	public Point(int index, int height){
-		this.index = index;
-		this.height = height;
 	}
 }
