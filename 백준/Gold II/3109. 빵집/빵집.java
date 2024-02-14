@@ -49,7 +49,7 @@ public class Main {
             int nx = dx[i] + x;
             int ny = dy[i] + y;
 
-            if (nx >= 0 && ny >= 0 && nx < r && ny < c && board[nx][ny] == '.') {
+            if (nx >= 0 && nx < r && ny < c && board[nx][ny] == '.') {
                 dfs(nx, ny);
             }
         }
