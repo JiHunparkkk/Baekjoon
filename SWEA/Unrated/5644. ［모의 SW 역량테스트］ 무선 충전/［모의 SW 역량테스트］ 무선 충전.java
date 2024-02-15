@@ -5,8 +5,7 @@ import java.util.Scanner;
 
 public class Solution {
 
-    private static int M, A, answer;
-    private static int[] userA_dir, userB_dir;
+    private static int A, answer;
     private static BC[] bc;
 
     public static void main(String[] args) {
@@ -15,13 +14,13 @@ public class Solution {
         T = sc.nextInt();
 
         for (int test_case = 1; test_case <= T; test_case++) {
-            M = sc.nextInt();
+            int M = sc.nextInt();
             A = sc.nextInt();
 
             int[] userA = {0, 0};
             int[] userB = {9, 9};
-            userA_dir = new int[M];
-            userB_dir = new int[M];
+            int[] userA_dir = new int[M];
+            int[] userB_dir = new int[M];
 
             for (int i = 0; i < M; i++) {
                 userA_dir[i] = sc.nextInt();
@@ -79,9 +78,6 @@ public class Solution {
     }
 
     private static void charge(int[] userA, int[] userB) {
-
-        int a = 0, b = 0;
-
         List<BC> ap = new ArrayList<>();
         List<BC> bp = new ArrayList<>();
         for (int i = 0; i < A; i++) {
@@ -121,36 +117,6 @@ public class Solution {
         }
         answer += result;
 
-//        if (ap.size() > 0) {
-//            a = ap.get(0).p;
-//        }
-//        if (bp.size() > 0) {
-//            b = bp.get(0).p;
-//        }
-
-//        for (int i = 0; i < A; i++) {
-//            if (isChargeable(userA, bc[i]) && isChargeable(userB, bc[i])) {
-//                int sum = 0;
-//
-//                for (int j = 0; j < ap.size(); j++) {
-//                    if (ap.get(j).c != bc[i].c) {
-//                        sum = Math.max(sum, ap.get(j));
-//                    }
-//                }
-//
-//                for (int j = 0; j < bp.size(); j++) {
-//                    if (bp.get(j) != bc[i].p) {
-//                        sum = Math.max(sum, bp.get(j));
-//                    }
-//                }
-//
-//                a = sum;
-//                b = bc[i].p;
-//
-//            }
-//        }
-
-//        answer += (a + b);
     }
 
     private static boolean isChargeable(int[] user, BC bc) {
