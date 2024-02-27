@@ -2,85 +2,85 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
 public class Main {
-    private static List<List<Node>> list;
-    private static boolean[] visited;
-    private static int[] dist;
+	
+	static class Node implements Comparable<Node>{
+		int x,w;
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		public Node(int x, int w) {
+			this.x = x;
+			this.w = w;
+		}
 
-        StringTokenizer st;
-
-        st = new StringTokenizer(br.readLine(), " ");
-        int v = Integer.parseInt(st.nextToken());
-        int e = Integer.parseInt(st.nextToken());
-        int k = Integer.parseInt(br.readLine());
-
-        visited = new boolean[v + 1];
-        dist = new int[v + 1];
-        list = new ArrayList<>();
-        for (int i = 1; i < v + 1; i++) {
-            list.add(new ArrayList<>());
-            dist[i] = Integer.MAX_VALUE;
-        }
-        list.add(new ArrayList<>());
-
-        for (int i = 0; i < e; i++) {
-            st = new StringTokenizer(br.readLine(), " ");
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
-
-            list.get(a).add(new Node(b, c));
-        }
-        solution(k);
-
-        for (int i = 1; i < v + 1; i++) {
-            int d = dist[i];
-            System.out.println(d == Integer.MAX_VALUE ? "INF" : d);
-        }
-
-    }
-
-    private static void solution(int k) {
-        PriorityQueue<Node> pq = new PriorityQueue<>();
-
-        pq.offer(new Node(k, 0));
-        dist[k] = 0;
-
-        while (!pq.isEmpty()) {
-            Node now = pq.poll();
-
-            if (!visited[now.index]) {
-                visited[now.index] = true;
-            }
-
-            for (Node next : list.get(now.index)) {
-                if (!visited[next.index] && dist[next.index] > dist[now.index] + next.weight) {
-                    dist[next.index] = dist[now.index] + next.weight;
-                    pq.offer(new Node(next.index, dist[next.index]));
-                }
-            }
-        }
-    }
-
-    static class Node implements Comparable<Node> {
-        int index;
-        int weight;
-
-        public Node(int index, int weight) {
-            this.index = index;
-            this.weight = weight;
-        }
-
-        @Override
-        public int compareTo(Node o) {
-            return this.weight - o.weight;
-        }
-    }
+		@Override
+		public int compareTo(Node o) {
+			return Integer.compare(this.w, o.w);
+		}
+	}
+	
+	private static int V,E,start;
+	private static List<List<Node>> list = new ArrayList<>();
+	private static int[] weight;
+	private static boolean[] visited;
+	
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st;
+		
+		st = new StringTokenizer(br.readLine());
+		V = Integer.parseInt(st.nextToken());
+		E = Integer.parseInt(st.nextToken());
+		start = Integer.parseInt(br.readLine());
+		weight = new int[V+1];
+		visited = new boolean[V+1];
+		
+		Arrays.fill(weight, Integer.MAX_VALUE);
+		for(int i=0;i<=V;i++) {
+			list.add(new ArrayList<>());
+		}
+		
+		for(int i=0;i<E;i++) {
+			st = new StringTokenizer(br.readLine());
+			int start = Integer.parseInt(st.nextToken());
+			int end = Integer.parseInt(st.nextToken());
+			int weight = Integer.parseInt(st.nextToken());
+			list.get(start).add(new Node(end,weight));
+		}
+		
+		solution();
+		for(int i=1;i<weight.length;i++) {
+			if(weight[i]==Integer.MAX_VALUE) {
+				System.out.println("INF");
+				continue;
+			}
+			System.out.println(weight[i]);
+		}
+	}
+	
+	private static void solution() {
+		PriorityQueue<Node> pq = new PriorityQueue<>();
+		pq.add(new Node(start, 0));
+		weight[start] = 0;
+		
+		while(!pq.isEmpty()) {
+			Node poll = pq.poll();
+			
+			if(!visited[poll.x]) {
+				visited[poll.x] = true;
+			}
+			
+			for(int i=0;i<list.get(poll.x).size();i++) {
+				Node next = list.get(poll.x).get(i);
+				if(!visited[next.x] && weight[next.x] > next.w + weight[poll.x]) {
+					weight[next.x] = next.w + weight[poll.x];
+					pq.add(new Node(next.x,weight[next.x]));
+				}
+			}
+		}
+	}
 }
