@@ -61,7 +61,6 @@ public class Main {
         }
 
         while (true) {
-
             boolean flag = bfs();
             if (!flag) {
                 break;
@@ -73,7 +72,6 @@ public class Main {
     private static boolean bfs() {
     	PriorityQueue<Point> pq = new PriorityQueue<>();
     	Queue<Point> queue = new ArrayDeque<>();
-    	
         queue.add(shark);
 
         boolean[][] visited = new boolean[n][n];
@@ -81,6 +79,7 @@ public class Main {
         int[] dy = {0, -1, 0, 1};
         boolean isPossible = false;
 
+        visited[shark.x][shark.y] = true;
         int dis = 1;
         while (!queue.isEmpty()) {
             int size = queue.size();
@@ -88,16 +87,12 @@ public class Main {
             for (int j = 0; j < size; j++) {
                 Point poll = queue.poll();
 
-                if (!visited[poll.x][poll.y]) {
-                    visited[poll.x][poll.y] = true;
-                }
-
                 for (int i = 0; i < 4; i++) {
                     int nx = poll.x + dx[i];
                     int ny = poll.y + dy[i];
 
                     if (nx >= 0 && ny >= 0 && nx < n && ny < n && !visited[nx][ny] 
-                    		&& (board[nx][ny] <= shark.size || board[nx][ny] == 9)) {
+                    		&& board[nx][ny] <= shark.size) {
                         queue.add(new Point(nx, ny, dis));
                         if (board[nx][ny]!=0 && board[nx][ny] <shark.size) {
                             pq.add(new Point(nx, ny, dis));
@@ -123,7 +118,6 @@ public class Main {
     	}
     	
         answer += point.dis;
-
         board[shark.x][shark.y] = 0;
         
         int now = shark.now - 1;
@@ -132,11 +126,8 @@ public class Main {
             size += 1;
             now = size;
         }
-//        shark = new Shark(point.x, point.y, size, now);
-        shark.x = point.x;
-        shark.y = point.y;
-        shark.size = size;
-        shark.now = now;
+        
+        shark = new Shark(point.x, point.y, size, now);
         board[point.x][point.y] = 0;
         
         return true;
