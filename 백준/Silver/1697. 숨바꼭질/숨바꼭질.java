@@ -1,48 +1,61 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Queue;
-import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class Main {
-
-    private static int[] visited = new int[100001];
-
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
         int n, k;
-        n = sc.nextInt();
-        k = sc.nextInt();
+        n = Integer.parseInt(st.nextToken());
+        k = Integer.parseInt(st.nextToken());
 
         System.out.println(bfs(n, k));
+        br.close();
     }
 
     private static int bfs(int n, int k) {
         Queue<Integer> queue = new ArrayDeque<>();
-        queue.offer(n);
+        queue.add(n);
+
+        int[] visited = new int[100001];
+        Arrays.fill(visited, Integer.MAX_VALUE);
         visited[n] = 0;
 
         while (!queue.isEmpty()) {
-
             int poll = queue.poll();
 
             if (poll == k) {
-                return visited[poll];
+                return visited[k];
             }
 
-            if (poll - 1 >= 0 && visited[poll - 1] == 0) {
-                visited[poll - 1] = visited[poll] + 1;
-                queue.offer(poll - 1);
-            }
-            if (poll + 1 <= 100000 && visited[poll + 1] == 0) {
+            if (check(poll + 1, poll, visited)) {
                 visited[poll + 1] = visited[poll] + 1;
-                queue.offer(poll + 1);
+                queue.add(poll + 1);
             }
-            if (poll * 2 <= 100000 && visited[poll * 2] == 0) {
+            if (check(poll - 1, poll, visited)) {
+                visited[poll - 1] = visited[poll] + 1;
+                queue.add(poll - 1);
+            }
+            if (check(poll * 2, poll, visited)) {
                 visited[poll * 2] = visited[poll] + 1;
-                queue.offer(poll * 2);
+                queue.add(poll * 2);
             }
         }
 
         return visited[k];
+    }
+
+    private static boolean check(int prev, int now, int[] visited) {
+        if (prev < 0 || prev >= visited.length) {
+            return false;
+        }
+
+        return visited[prev] > visited[now] + 1;
     }
 }
