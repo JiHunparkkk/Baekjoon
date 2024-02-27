@@ -24,6 +24,7 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
 
+        //입력
         int M, N;
         M = Integer.parseInt(st.nextToken());
         N = Integer.parseInt(st.nextToken());
@@ -40,25 +41,23 @@ public class Main {
             }
         }
 
-        int answer = -1;    //무조건 한번은 검사하므로 -1
+        int answer = -1;    //무조건 한번은 검사하므로 기본값 -1
         visited = new boolean[N][M];
-        while (!queue.isEmpty()) {
+        while (!queue.isEmpty()) {  //탐색 로직 시작
             bfs(N, M, board);
             answer++;
         }
-        long result = Arrays.stream(board)
-                .flatMapToInt(Arrays::stream)
-                .filter(x -> x == 0)
-                .count();
-        
-        if (result > 0) {
-            System.out.println(-1);
-        } else {
+
+        //덜 익은 토마토가 있는지 확인
+        if (checkComplete(board)) {
             System.out.println(answer);
+        } else {
+            System.out.println(-1);
         }
         br.close();
     }
 
+    //시간복잡도를 줄이기위해, 다음 탐색할 위치를 다른 큐에 저장
     private static void bfs(int N, int M, int[][] board) {
         int[] dx = {-1, 0, 1, 0};
         int[] dy = {0, 1, 0, -1};
@@ -85,5 +84,14 @@ public class Main {
         }
 
         queue = nextQ;
+    }
+
+    private static boolean checkComplete(int[][] board) {
+        long result = Arrays.stream(board)
+                .flatMapToInt(Arrays::stream)
+                .filter(x -> x == 0)
+                .count();
+
+        return result == 0;
     }
 }
