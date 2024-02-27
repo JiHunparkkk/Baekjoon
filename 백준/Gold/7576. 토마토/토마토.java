@@ -1,79 +1,89 @@
-import java.util.LinkedList;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Queue;
-import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class Main {
-    static int m, n, L;
-    static int[][] arr;
-    static int[] dx = {-1, 0, 1, 0};
-    static int[] dy = {0, 1, 0, -1};
-    static boolean flag=true;
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
 
-        m = sc.nextInt();
-        n = sc.nextInt();
-        arr = new int[n][m];
+    static class Point {
+        int x, y;
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                arr[i][j] = sc.nextInt();
-                if(arr[i][j]==0) flag=false;
-            }
+        public Point(int x, int y) {
+            this.x = x;
+            this.y = y;
         }
-
-        if(flag)
-            System.out.println(0);
-        else{
-            BFS();
-            System.out.println(L);
-        }
-
     }
 
-    static void BFS() {
-        Queue<Point12> queue = new LinkedList<>();
+    private static boolean[][] visited;
+    private static Queue<Point> queue;
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if(arr[i][j]==1)
-                    queue.offer(new Point12(i, j, 0));
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int M, N;
+        M = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(st.nextToken());
+
+        int[][] board = new int[N][M];
+        queue = new ArrayDeque<>();
+        for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine());
+            for (int j = 0; j < M; j++) {
+                board[i][j] = Integer.parseInt(st.nextToken());
+                if (board[i][j] == 1) {
+                    queue.add(new Point(i, j));
+                }
             }
         }
 
-        L = 0;
+        int answer = -1;    //무조건 한번은 검사하므로 -1
+        visited = new boolean[N][M];
         while (!queue.isEmpty()) {
-            Point12 tmp = queue.poll();
+            bfs(N, M, board);
+            answer++;
+        }
+        long result = Arrays.stream(board)
+                .flatMapToInt(Arrays::stream)
+                .filter(x -> x == 0)
+                .count();
+        
+        if (result > 0) {
+            System.out.println(-1);
+        } else {
+            System.out.println(answer);
+        }
+        br.close();
+    }
+
+    private static void bfs(int N, int M, int[][] board) {
+        int[] dx = {-1, 0, 1, 0};
+        int[] dy = {0, 1, 0, -1};
+        Queue<Point> nextQ = new ArrayDeque<>();
+
+        while (!queue.isEmpty()) {
+            Point poll = queue.poll();
+
+            if (!visited[poll.x][poll.y]) {
+                visited[poll.x][poll.y] = true;
+            }
 
             for (int i = 0; i < 4; i++) {
-                int nx = tmp.x + dx[i];
-                int ny = tmp.y + dy[i];
+                int nx = poll.x + dx[i];
+                int ny = poll.y + dy[i];
 
-                if (nx >= 0 && nx < n && ny >= 0 && ny < m && arr[nx][ny]==0) {
-                    arr[nx][ny] = 1;
-                    queue.offer(new Point12(nx, ny, tmp.time + 1));
-                }
-            }
-            L = Math.max(tmp.time, L);
-        }
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if(arr[i][j]==0) {
-                    L = -1;
-                    return;
+                if (nx >= 0 && ny >= 0 && nx < N && ny < M
+                        && !visited[nx][ny] && board[nx][ny] == 0) {
+                    visited[nx][ny] = true;
+                    board[nx][ny] = 1;
+                    nextQ.add(new Point(nx, ny));
                 }
             }
         }
-    }
-}
 
-class Point12{
-    int x,y,time;
-
-    public Point12(int x, int y,int time) {
-        this.x = x;
-        this.y = y;
-        this.time = time;
+        queue = nextQ;
     }
 }
