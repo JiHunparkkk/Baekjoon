@@ -1,26 +1,16 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Main {
-	
-	private static final int BLOCK = 1;
-	private static final int ROW = 2;
-	private static final int COL = 3;
-	private static final int DIAGONAL = 4;
-	
-	private static int n,answer;
-	private static int[][] board;
-	private static int[] dx = {0,1,1};	//가로,세로,대각선
-	private static int[] dy = {1,0,1};
-
-	public static void main(String[] args) throws Exception {
+		
+	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st;
-	
-		n = Integer.parseInt(br.readLine());
-		board = new int[n][n];
 		
+		int n = Integer.parseInt(br.readLine());
+		int[][] board = new int[n][n];
 		for(int i=0;i<n;i++) {
 			st = new StringTokenizer(br.readLine());
 			for(int j=0;j<n;j++) {
@@ -28,52 +18,27 @@ public class Main {
 			}
 		}
 		
-		board[0][1] = ROW;
-		answer=0;
-		
-		movePipe(0, 1);
-		System.out.println(answer);
+		System.out.println(solution(n,board));
 	}
 	
-	private static void movePipe(int x,int y) {
-		if(x==n-1 && y==n-1) {
-			answer++;
-			return;
-		}
+	private static long solution(int n,int[][] board) {
+		int[][][] dp = new int[n][n][3];
+		dp[0][1][0] = 1;
 		
-		int i=0;
-		if(board[x][y]==COL) {
-			i=1;
-		}
-		for(;i<3;i++) {			
-			int nx = x+dx[i];
-			int ny = y+dy[i];
-			
-			
-			if(nx>=0 && ny>=0 && nx<n && ny<n && board[nx][ny]!=BLOCK) {
-				board[nx][ny] = i+2;
-				
-				if(board[nx][ny]==DIAGONAL) {
-					boolean isBlocked = false;
-					for(int j=0;j<3;j++) {
-						if(board[x+dx[j]][y+dy[j]]==1) {
-							isBlocked=true;
-							break;
-						}
-					}
-					if(isBlocked) {
-						board[nx][ny] = 0;
-						continue;
-					}
+		for(int i=0;i<n;i++) {
+			for(int j=2;j<n;j++) {
+				if(board[i][j] == 0) {	//가로
+					dp[i][j][0] = dp[i][j-1][0] + dp[i][j-1][2];					
 				}
-				
-				movePipe(nx, ny);
-				board[nx][ny] = 0;
-			}
-			if(board[x][y]==ROW) {
-				i++;
+				if(i-1>=0 && board[i][j]==0) {	//세로
+					dp[i][j][1] = dp[i-1][j][1] + dp[i-1][j][2];
+				}
+				if(i-1>=0 && board[i][j]==0 && board[i][j-1]==0 && board[i-1][j]==0) {
+					dp[i][j][2] = dp[i-1][j-1][0] + dp[i-1][j-1][1] + dp[i-1][j-1][2];
+				}
 			}
 		}
 		
+		return dp[n-1][n-1][0] + dp[n-1][n-1][1] + dp[n-1][n-1][2];
 	}
 }
