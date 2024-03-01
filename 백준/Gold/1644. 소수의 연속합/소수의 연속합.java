@@ -1,45 +1,51 @@
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int N = Integer.parseInt(br.readLine());
+        List<Integer> sosu = new ArrayList<>();
 
-        int n = sc.nextInt();
-        int answer=0,cnt=0;
-        int[] x = new int[n+1];
+        //에라토스테네스의 체
+        makeSosu(sosu, N);
 
-        for (int i = 2; i * i < n + 1; i++) {
-            for (int j = i; j < n + 1; j = j + i) {
-                if(j!=i)
-                    x[j] = 1;
+        //2부터 더해가면서 출발
+        int start = 0, sum = 0, answer = 0;
+        for (int i = 0; i < sosu.size(); i++) { //i는 끝에 값
+            sum += sosu.get(i);
+
+            while (sum > N) {
+                sum -= sosu.get(start++);
             }
-        }
 
-        for (int i = 2; i < n + 1; i++) {
-            if(x[i]==0) cnt++;
-        }
-
-        int[] y = new int[cnt];
-        for (int i = 2,j=0; i < n+1; i++) {
-            if(x[i]==0)
-                y[j++] = i;
-        }
-
-
-        int lp = 0, rp = 0,sum=0;
-        for (; rp < cnt; rp++) {
-            if (sum < n) {
-                sum += y[rp];
-            }
-            while (sum >= n) {
-                if(sum==n){
-                    answer++;
-                }
-                sum -= y[lp];
-                lp++;
+            if (sum == N) {
+                answer++;
             }
         }
 
         System.out.println(answer);
+    }
+
+    private static void makeSosu(List<Integer> sosu, int N) {
+        boolean[] noSosu = new boolean[N + 1];
+
+        noSosu[0] = noSosu[1] = true;
+        for (int i = 2; i * i <= N; i++) {
+            if (!noSosu[i]) {
+                for (int j = i * i; j <= N; j += i) {
+                    noSosu[j] = true;
+                }
+            }
+        }
+
+        for (int i = 0; i <= N; i++) {
+            if (!noSosu[i]) {
+                sosu.add(i);
+            }
+        }
     }
 }
