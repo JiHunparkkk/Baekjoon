@@ -1,95 +1,104 @@
-import java.util.*;
- 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.StringTokenizer;
+
 public class Main {
-    
-    static int n, l, r;
-    static int[][] board;
-    static boolean[][] visited;
-    static int[] dx = {0, 1, 0, -1};
-    static int[] dy = {1, 0, -1, 0};
-    static ArrayList<Node> list; //인구 이동이 필요한 노드 리스트
- 
-    public static void main(String[] args) {
-        Scanner scan = new Scanner(System.in);    
- 
-        n = scan.nextInt();
-        l = scan.nextInt();
-        r = scan.nextInt();
-        
-        board = new int[n][n];
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < n; j++) {
-                board[i][j] = scan.nextInt();
-            }
-        }
-        
-        System.out.println(move());
-    }
-    
-    public static int move() { //더 이상 인구이동이 일어나지 않을 때까지 반복
-        int result = 0;
-        while(true) {
-            boolean isMove = false;
-            visited = new boolean[n][n];
-            for(int i = 0; i < n; i++) {
-                for(int j = 0; j < n; j++) {
-                    if(!visited[i][j]) {
-                        int sum = bfs(i, j); //bfs탐색으로 열릴 수 있는 국경선 확인 하며 인구 이동할 총 인구수 반환
-                        if(list.size() > 1) {
-                            changePopulation(sum); //열린 국경선 내의 노드들 인구 변경
-                            isMove = true;
-                        }    
-                    }
-                }
-            }
-            if(!isMove) return result;;
-            result++;
-        }
-    }
-    
-    public static int bfs(int x, int y) {
-        Queue<Node> q = new LinkedList<>();
-        list = new ArrayList<>();
-        
-        q.offer(new Node(x, y));
-        list.add(new Node(x, y));
-        visited[x][y] = true;
-        
-        int sum = board[x][y];
-        while(!q.isEmpty()) {
-            Node current = q.poll();
-            
-            for(int i = 0; i < 4; i++) {
-                int nx = current.x + dx[i];
-                int ny = current.y + dy[i];
-                if(nx >= 0 && ny >= 0 && nx < n && ny < n && !visited[nx][ny]) {
-                    int diff = Math.abs(board[current.x][current.y] - board[nx][ny]);
-                    if(l <= diff && diff <= r) {
-                        q.offer(new Node(nx, ny));
-                        list.add(new Node(nx, ny));
-                        sum += board[nx][ny];
-                        visited[nx][ny] = true;
-                    }        
-                }
-            }
-        }
-        return sum;
-    }
-    
-    public static void changePopulation(int sum) {
-        int avg = sum / list.size();
-        for(Node n : list) {
-            board[n.x][n.y] = avg;
-        }
-    }
-    
-    public static class Node {
-        int x; 
-        int y;
-        
-        public Node(int x, int y) {
+
+    private static class Point {
+        int x, y;
+
+        public Point(int x, int y) {
             this.x = x;
             this.y = y;
         }
+    }
+
+    private static int n, l, r;
+    private static int[][] board;
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st;
+
+        st = new StringTokenizer(br.readLine());
+        n = Integer.parseInt(st.nextToken());
+        l = Integer.parseInt(st.nextToken());
+        r = Integer.parseInt(st.nextToken());
+        board = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            st = new StringTokenizer(br.readLine());
+            for (int j = 0; j < n; j++) {
+                board[i][j] = Integer.parseInt(st.nextToken());
+            }
+        }
+
+        int openCnt = 0;
+        int answer = -1;
+        while (openCnt != n * n) {
+            int[][] visited = new int[n][n];    //연합 별로 다른 숫자를 저장 (unionNum)
+            int[] peopleCnt = new int[n * n + 1];   //연합 숫자에 따라 인구수를 저장
+            int unionNum = 1;
+            openCnt = 0;
+
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (visited[i][j] == 0) {
+                        boolean flag = bfs(i, j, visited, unionNum, peopleCnt);
+                        if (flag) {
+                            openCnt++;
+                        }
+                        unionNum++;
+                        continue;
+                    }
+                    board[i][j] = peopleCnt[visited[i][j]];
+                }
+            }
+            answer++;
+        }
+        System.out.println(answer);
+    }
+
+    private static boolean bfs(int x, int y, int[][] visited, int unionNum, int[] peopleCnt) {
+        Queue<Point> queue = new ArrayDeque<>();
+        queue.add(new Point(x, y));
+        visited[x][y] = unionNum;
+
+        int[] dx = {-1, 0, 1, 0};
+        int[] dy = {0, 1, 0, -1};
+        int size = 1;
+        int sum = board[x][y];
+        boolean flag = true;    //연합이 되는지 안되는지 확인
+        while (!queue.isEmpty()) {
+            Point poll = queue.poll();
+
+            for (int i = 0; i < 4; i++) {
+                int nx = poll.x + dx[i];
+                int ny = poll.y + dy[i];
+
+                if (nx < 0 || ny < 0 || nx >= n || ny >= n) {
+                    continue;
+                }
+
+                if (validCond(poll.x, poll.y, nx, ny, visited)) {
+                    size++;
+                    flag = false;
+                    sum += board[nx][ny];
+                    visited[nx][ny] = unionNum;
+                    queue.add(new Point(nx, ny));
+                }
+            }
+        }
+
+        peopleCnt[unionNum] = (int) Math.floor(sum / size);
+        board[x][y] = peopleCnt[unionNum];
+        return flag;
+    }
+
+    private static boolean validCond(int x, int y, int nx, int ny, int[][] visited) {
+        int diff = Math.abs(board[nx][ny] - board[x][y]);
+        return visited[nx][ny] == 0 && l <= diff && diff <= r;
     }
 }
