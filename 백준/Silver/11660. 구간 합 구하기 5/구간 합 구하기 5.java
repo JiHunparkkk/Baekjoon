@@ -4,42 +4,39 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Main {
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringBuilder sb = new StringBuilder();
 		StringTokenizer st;
+		StringBuffer sb = new StringBuffer();
 		
-		int n,m;
-		
+		int n, m;
 		st = new StringTokenizer(br.readLine());
 		n = Integer.parseInt(st.nextToken());
 		m = Integer.parseInt(st.nextToken());
 		
-		int[][] arr = new int[n+1][n+1];
-		long[][] dp = new long[n+1][n+1];
-		for(int i=1;i<=n;i++) {
+		int[][] board = new int[n + 1][n + 1];
+		int[][] dp = new int[n + 1][n + 1];
+		for(int i = 1; i <= n ; i++) {
 			st = new StringTokenizer(br.readLine());
-			for(int j=1;j<=n;j++) {
-				arr[i][j] = Integer.parseInt(st.nextToken());
-				dp[i][j] = dp[i][j-1] + dp[i-1][j] - dp[i-1][j-1] + arr[i][j];
+			for(int j = 1; j <= n; j++) {
+				board[i][j] = Integer.parseInt(st.nextToken());
+				dp[i][j] = dp[i][j - 1] + dp[i - 1][j] - dp[i - 1][j - 1] + board[i][j];
 			}
 		}
 		
-		
-		
-		for(int i=0;i<m;i++) {
+		for(int i = 0; i < m; i++) {
+			int x1, x2;
+			int y1, y2;
+			
 			st = new StringTokenizer(br.readLine());
-			
-			int x1 = Integer.parseInt(st.nextToken());
-			int y1 = Integer.parseInt(st.nextToken());
-			int x2 = Integer.parseInt(st.nextToken());
-			int y2 = Integer.parseInt(st.nextToken());
-			
-			sb.append(dp[x2][y2] - dp[x2][y1-1] - dp[x1-1][y2] + dp[x1-1][y1-1]);
-			sb.append("\n");
+			x1 = Integer.parseInt(st.nextToken());
+			y1 = Integer.parseInt(st.nextToken());
+			x2 = Integer.parseInt(st.nextToken());
+			y2 = Integer.parseInt(st.nextToken());
+			int sum = dp[x2][y2] - dp[x1 - 1][y2] - dp[x2][y1 - 1] + dp[x1 - 1][y1 - 1];
+			sb.append(sum).append("\n");
 		}
 		
 		System.out.println(sb);
-		br.close();
 	}
 }
