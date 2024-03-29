@@ -34,16 +34,18 @@ public class Solution {
 			 w = Integer.parseInt(st.nextToken());
 			 h = Integer.parseInt(st.nextToken());
 			 
-			 int[][] board = new int[h][w];
+			 int[][] board = new int[h + 1][w + 1];
 			 for(int i = 0; i < h; i++) {
 				 st = new StringTokenizer(br.readLine());
 				 for(int j = 0; j < w; j++) {
 					 board[i][j] = Integer.parseInt(st.nextToken());
+					 if(board[i][j] > 0) {
+					 }
 				 }
 			 }
 			 
 			 answer = Integer.MAX_VALUE;
-			 solution(0, new int[n], board);
+			 solution(board, n);
 						 
 			 sb.append("#"+test_case+" " + answer).append("\n");
 		 }
@@ -51,31 +53,42 @@ public class Solution {
 		 System.out.println(sb.toString());
 	}
 	
-	private static void solution(int depth, int[] arr, int[][] board) {
-		if(depth == n) {
-			breakWall(copyBoard(board), arr);
+	private static void solution(int[][] board, int n) {
+		List<Point> firsts = findTop(board);
+		
+		if(firsts.isEmpty()) {
+			answer = 0;
 			return;
 		}
 		
-		for(int i = 0; i < w; i++) {
-			arr[depth] = i;
-			solution(depth + 1, arr, board);
+		for(int i = 0; i < firsts.size(); i++) {
+			Point first = firsts.get(i);
+			
+			int[][] copy = copyBoard(board);
+			breakWall(copy, first, 0);
 		}
 	}
 	
-	private static void breakWall(int[][] copy, int[] arr) {
-		for(int i = 0; i < arr.length; i++) {
-			Point now = findTop(copy, arr[i]);
-			
-			if(now == null) {
-				continue;
-			}
-			
-			bomb(copy, now);
-			down(copy);
-//			organizeArray(copy);
+	private static void breakWall(int[][] copy, Point now, int depth) {
+		if(depth == n) {
+			return;
 		}
+		
+		
+		bomb(copy, now);	//now의 현재 벽돌 부수기 (부숴진 갯수 저장)
+		organizeArray(copy);	//벽돌 정렬해주기
 		answer = Math.min(answer, calSum(copy));
+		
+		if(answer == 0) return;
+
+		//다음 벽돌 찾기
+		List<Point> nexts = findTop(copy);
+		for(int i = 0; i < nexts.size(); i++) {
+			Point next = nexts.get(i);
+			
+			int[][] nextBoard = copyBoard(copy);
+			breakWall(nextBoard, next, depth + 1);
+		}
 	}
 	
 	private static void bomb(int[][] copy, Point now) {
@@ -85,27 +98,22 @@ public class Solution {
 		Queue<Point> queue = new ArrayDeque<>();
 		queue.add(now);
 		
-		boolean[][] visited = new boolean[h][w];
 		copy[now.x][now.y] = 0;
-		visited[now.x][now.y] = true;
-		
+
 		while(!queue.isEmpty()) {
 			Point poll = queue.poll();
-			
-			copy[poll.x][poll.y] = 0;
 			
 			for(int i = 0; i < 4;i ++) {
 				int nx = poll.x + dx[i];
 				int ny = poll.y + dy[i];
 				for(int j = 1; j < poll.num; j++) {
-					if(isIn(nx, ny) && !visited[nx][ny]) {
+					if(isIn(nx, ny)) {
 						if(copy[nx][ny] > 0) {
-							queue.add(new Point(nx, ny, copy[nx][ny]));	
-							copy[nx][ny] = 0;
+							queue.add(new Point(nx, ny, copy[nx][ny]));
 						}
-						visited[nx][ny] = true;
+						
+						copy[nx][ny] = 0;
 					}
-
 					nx += dx[i];
 					ny += dy[i];
 				}
@@ -113,30 +121,10 @@ public class Solution {
 		}
 		
 	}
-	
-	 public static void down(int[][] test) {
-	        for(int i = h-2; i>=0 ; i--) {
-	            for(int j = 0 ; j<w ; j++) {
-	                if(test[i][j] !=0 && test[i+1][j]==0) {
-	                    int temp = test[i][j];
-	                    test[i][j] = 0;
-	                    boolean flag = false;
-	                    for(int find = i+1 ; find<h ; find++) {
-	                        if(test[find][j]!=0) {
-	                            test[find-1][j] = temp;
-	                            flag = true;
-	                            break;
-	                        }
-	                    }
-	                    if(!flag) test[h-1][j] = temp;
-	                }
-	            }
-	        }
-	    }
 
 	private static void organizeArray(int[][] copy) {
 		for(int i = 0; i < w; i++) {
-			for(int j = h - 2; j > 0 ; j--) {
+			for(int j = h - 2; j >= 0 ; j--) {
 				if(copy[j][i] > 0) {
 					int idx = j;
 					while(idx + 1 < h && copy[idx][i] > 0 && copy[idx + 1][i] == 0) {
@@ -165,13 +153,18 @@ public class Solution {
 		return sum;
 	}
 	
-	private static Point findTop(int[][] board, int idx) {		
-		for(int j = 0; j < h; j++) {
-			if(board[j][idx] > 0) {
-				return new Point(j, idx, board[j][idx]);
+	private static List<Point> findTop(int[][] board) {
+		List<Point> list = new ArrayList<>();
+		
+		for(int i = 0; i < w; i++) {
+			for(int j = 0; j < h; j++) {
+				if(board[j][i] > 0) {
+					list.add(new Point(j, i, board[j][i]));
+					break;
+				}
 			}
 		}
-		return null;
+		return list;
 	}
 	
 	private static int[][] copyBoard(int[][] board){
@@ -184,4 +177,5 @@ public class Solution {
 		 }
 		return newBoard;
 	}
+
 }
