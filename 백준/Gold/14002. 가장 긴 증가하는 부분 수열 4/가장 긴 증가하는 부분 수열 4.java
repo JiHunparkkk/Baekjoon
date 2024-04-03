@@ -5,47 +5,63 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-class Main {
+public class Main {
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st;
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
-        StringBuilder sb = new StringBuilder();
+		int n = Integer.parseInt(br.readLine());
+		int[] arr = new int[n];
+		int[] LIS = new int[n];
+		int[] record = new int[n];
 
-        int n = Integer.parseInt(br.readLine());
-        int[] arr = new int[n];
-        List<List<Integer>> list = new ArrayList<>();
+		st = new StringTokenizer(br.readLine());
+		for (int i = 0; i < n; i++) {
+			arr[i] = Integer.parseInt(st.nextToken());
+		}
 
-        st = new StringTokenizer(br.readLine(), " ");
-        for (int i = 0; i < n; i++) {
-            arr[i] = Integer.parseInt(st.nextToken());
-            list.add(new ArrayList<>());
-            list.get(i).add(arr[i]);
-        }
+		LIS[0] = arr[0];
+		record[0] = 1; // 위치 기록
+		int idx = 0; // 다음 들어갈 위치
+		for (int i = 1; i < n; i++) {
+			if (LIS[idx] < arr[i]) {
+				LIS[++idx] = arr[i];
+				record[i] = idx + 1;
+			} else {
+				int pos = bnSearch(arr[i], 0, idx, LIS);
+				LIS[pos] = arr[i];
+				record[i] = pos + 1;
+			}
+		}
 
-        int maxCnt = 1, maxIndex = 0;
-        for (int i = 1; i < n; i++) {
-            for (int j = i - 1; j >= 0; j--) {
-                if (arr[i] > arr[j]) {
-                    if (list.get(i).size() <= list.get(j).size()) {
-                        list.get(i).clear();
-                        list.get(i).addAll(list.get(j));
-                        list.get(i).add(arr[i]);
-                    }
-                }
-            }
-            if (maxCnt < list.get(i).size()) {
-                maxCnt = list.get(i).size();
-                maxIndex = i;
-            }
-        }
+		int size = idx + 1;
+		List<Integer> answer = new ArrayList<>();
+		for (int i = n - 1; i >= 0; i--) {
+			if (idx + 1 == record[i]) {
+				idx--;
+				answer.add(arr[i]);
+			}
+		}
 
-        sb.append(maxCnt).append("\n");
-        for (int i = 0; i < maxCnt; i++) {
-            sb.append(list.get(maxIndex).get(i)).append(" ");
-        }
-        System.out.println(sb);
+		StringBuilder sb = new StringBuilder();
+		sb.append(size).append("\n");
+		for (int i = size - 1; i >= 0; i--) {
+			sb.append(answer.get(i)).append(" ");
+		}
+		System.out.println(sb.toString());
+	}
 
-        br.close();
-    }
+	private static int bnSearch(int num, int left, int right, int[] LIS) {
+		while (left < right) {
+			int mid = (left + right) / 2;
+
+			if (LIS[mid] < num) {
+				left = mid + 1;
+			} else {
+				right = mid;
+			}
+		}
+
+		return right;
+	}
 }
