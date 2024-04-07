@@ -1,30 +1,24 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.PriorityQueue;
+import java.util.Comparator;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class Main {
 
-    private static class Point implements Comparable<Point> {
+    private static class Point {
         int x, y;
 
         public Point(int x, int y) {
             this.x = x;
             this.y = y;
         }
-
-        @Override
-        public int compareTo(Point o) {
-            if (y == o.y) {
-                return Integer.compare(x, o.x);
-            }
-            return Integer.compare(y, o.y);
-        }
     }
 
-    private static int M, N, L;
+    private static int M, N, L, answer;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -42,40 +36,48 @@ public class Main {
             shooter[i] = new Point(0, num);
         }
 
-        PriorityQueue<Point> animal = new PriorityQueue<>();
+        List<Point> animals = new ArrayList<>();
         for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
             int x, y;
             x = Integer.parseInt(st.nextToken());
             y = Integer.parseInt(st.nextToken());
 
-            animal.add(new Point(y, x));
+            animals.add(new Point(y, x));
         }
 
-        Arrays.sort(shooter);
-        int answer = 0;
-        boolean notArrange = false;   //이전에도 사냥하지 못한 동물일 경우 그냥 삭제
-        for (int i = 0; i < M; i++) {
-            while (!animal.isEmpty()) {
-                Point peek = animal.peek();
-                int dis = Math.abs(shooter[i].y - peek.y) + peek.x;
-
-                if (dis > L) {
-                    if (notArrange) {   //이전 사대와 다음 사대 둘 다 사냥 못하면 삭제 후 사냥 재시작
-                        animal.poll();
-                        notArrange = false;
-                        continue;
-                    } else {
-                        notArrange = true;
-                    }
-                    break;
-                }
-                animal.poll();
-                answer++;
-                notArrange = false;
+        Arrays.sort(shooter, new Comparator<Point>() {
+            @Override
+            public int compare(Point o1, Point o2) {
+                return o1.y - o2.y;
             }
+        });
+        for (Point animal : animals) {
+            findShooter(animal, shooter);
         }
 
         System.out.println(answer);
+    }
+
+    private static void findShooter(Point animal, Point[] shooter) {
+        int left = 0;
+        int right = M;
+
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            if (mid >= M) {
+                return;
+            }
+
+            int dis = Math.abs(shooter[mid].y - animal.y) + animal.x;
+            if (dis > L && animal.y < shooter[mid].y) {
+                right = mid - 1;
+            } else if (dis > L && animal.y >= shooter[mid].y) {
+                left = mid + 1;
+            } else if (dis <= L) {
+                answer++;
+                return;
+            }
+        }
     }
 }
