@@ -1,20 +1,17 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 class Main {
-
     public static void main(String[] args) throws Exception {
-        // for coding
-        // System.setIn(new FileInputStream("./input/input_11051.txt"));
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        StringTokenizer st = new StringTokenizer(br.readLine(), " ", false);
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
         int N = Integer.parseInt(st.nextToken());
         int K = Integer.parseInt(st.nextToken());
 
         int[][] dp = new int[N + 1][N + 1];
-        
+
         for (int i = 0; i < dp.length; i++) {
             for (int j = 0; j <= i; j++) {
                 if (i == j || j == 0) {
@@ -24,9 +21,6 @@ class Main {
                 }
             }
         }
-
-        bw.write(dp[N][K] + "");
-
-        bw.close();
+        System.out.println(dp[N][K]);
     }
 }
