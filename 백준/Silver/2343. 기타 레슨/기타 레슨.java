@@ -16,19 +16,19 @@ class Main {
         int[] arr = new int[N];
         st = new StringTokenizer(br.readLine());
 
-        int left = 0, right = 0;
+        int left = 0;
         for (int i = 0; i < N; i++) {
             arr[i] = Integer.parseInt(st.nextToken());
-            right += arr[i];
             left = Math.max(left, arr[i]);
         }
 
         //블루레이 크기가 너무 크면, 한 번에 다 들어감
         //블루레이 크기가 너무 작으면, 갯수가 많아짐
-        System.out.println(solution(arr, left, right));
+        System.out.println(solution(arr, left));
     }
 
-    private static int solution(int[] arr, int left, int right) {
+    private static int solution(int[] arr, int left) {
+        int right = 1_000_000_000;
         while (left <= right) {
             int mid = (left + right) / 2;
 
