@@ -1,9 +1,9 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.StringTokenizer;
 
 class Main {
@@ -50,14 +50,8 @@ class Main {
     }
 
     private static int solution(int[] time, int[] in_degree) {
-        PriorityQueue<Integer> queue = new PriorityQueue<>(new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                return time[o1] - time[o2];
-            }
-        });
+        Queue<Integer> queue = new ArrayDeque<>();
         int[] totalTime = new int[N + 1];
-
         for (int i = 1; i <= N; i++) {
             if (in_degree[i] == 0) {
                 queue.add(i);
