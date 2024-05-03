@@ -35,10 +35,10 @@ class Solution {
     private static boolean canChange(String origin, String change) {
         int cnt = 0;
         for(int i = 0; i < origin.length(); i++) {
-            if(origin.charAt(i) != change.charAt(i)) {
+            if(origin.charAt(i) == change.charAt(i)) {
                 cnt++;
             }
         }
-        return cnt == 1;
+        return cnt == origin.length() - 1;
     }
 }
