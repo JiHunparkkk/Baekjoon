@@ -4,7 +4,7 @@ import java.io.InputStreamReader;
 
 public class Main {
 
-    private static int K, count;
+    private static int K;
 
     public static void main(String[] args) throws IOException {
         init();
@@ -17,36 +17,10 @@ public class Main {
     }
 
     private static void solution() {
-        int idx = 1;
-        while(true) {
-            int cnt = (int)Math.pow(2, idx);
-
-            if(K - cnt <= 0) {
-                find(idx, 0, new int[idx]);
-                break;
-            }
-
-            idx++;
-            K -= cnt;
+        String result = Integer.toBinaryString(K + 1).replace('0', '4').replace('1', '7');
+        for (int i = 1; i < result.length(); i++) {
+            System.out.print(result.charAt(i));
         }
     }
 
-    private static void find(int limit, int depth, int[] arr) {
-        if (depth == limit) {
-            count++;
-            if(count == K) {
-                for (int i : arr) {
-                    System.out.print(i);
-                }
-                System.out.println();
-            }
-            return;
-        }
-
-        arr[depth] = 4;
-        find(limit, depth + 1, arr);
-
-        arr[depth] = 7;
-        find(limit, depth + 1, arr);
-    }
 }
