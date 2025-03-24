@@ -1,58 +1,60 @@
 import java.util.*;
 
 class Solution {
-    private static class Evidence {
+    
+    //모든 물건 훔쳐야됨
+    //단, A가 최소가 되는쪽으로 유도
+    //불가능하면 -1
+    //정렬
+        //A 내림차순, 같으면 B 오름차순 -> B부터 선택
+
+    private static class Evidence implements Comparable<Evidence> {
         int a, b;
-        double ratio;
         
         public Evidence(int a, int b) {
             this.a = a;
             this.b = b;
-            this.ratio = (double) a / b; // A/B 비율 계산
+        }
+        
+        //(3,1), (2,1)
+        @Override
+        public int compareTo(Evidence o1) {
+            double originRatio = (double) this.a / this.b;
+            double objectRatio = (double) o1.a / o1.b;
+            
+            if(Double.compare(originRatio, objectRatio) == 0) {
+                return Integer.compare(o1.b, this.b);
+            }
+            return Double.compare(objectRatio, originRatio);
         }
     }
-
+    
+    private static List<Evidence> evidences = new ArrayList<>();
+    
     public int solution(int[][] info, int n, int m) {
-        List<Evidence> evidences = new ArrayList<>();
         
-        for (int[] item : info) {
-            evidences.add(new Evidence(item[0], item[1]));
+        for(int i = 0; i < info.length; i++) {
+            evidences.add(new Evidence(info[i][0], info[i][1]));
         }
-
-        // 정렬: 비율 내림차순, 같은 비율이면 B 내림차순
-        evidences.sort((o1, o2) -> {
-            if (Double.compare(o2.ratio, o1.ratio) == 0) {
-                return Integer.compare(o2.b, o1.b); // B 내림차순
-            }
-            return Double.compare(o2.ratio, o1.ratio); // 비율 내림차순
-        });
-
-        boolean[] visited = new boolean[evidences.size()];
-        int a = 0, b = 0;
-
-        // 먼저 B를 채우기
-        for (int i = 0; i < evidences.size(); i++) {
-            Evidence item = evidences.get(i);
-            if (m > b + item.b) {
-                b += item.b;
-                visited[i] = true;
+        
+        Collections.sort(evidences);
+        
+        int answer = 0;
+        for(int i = 0; i < evidences.size(); i++) {
+            Evidence evidence = evidences.get(i);
+            int a = evidence.a;
+            int b = evidence.b;
+            
+            if(m > b) {
+                m -= b;
+            } else if(n > a) {
+                n -= a;
+                answer += a;
+            } else {
+                return -1;
             }
         }
-
-        // 남은 A를 채우기
-        for (int i = 0; i < evidences.size(); i++) {
-            if (visited[i]) continue;
-            Evidence item = evidences.get(i);
-            if (n > a + item.a) {
-                a += item.a;
-                visited[i] = true;
-            }
-        }
-
-        // 모든 항목을 선택할 수 없으면 -1 반환
-        for (boolean v : visited) {
-            if (!v) return -1;
-        }
-        return a;
+        
+        return answer;
     }
 }
