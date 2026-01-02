@@ -1,0 +1,8 @@
+-- 코드를 입력하세요
+-- 1.ANIMAL_INS 에만 있는 ID를 찾아서,
+-- 2.보호 시작일 기준 오름차순 정렬 후 앞의 3개 뽑아서 출력
+SELECT NAME, DATETIME
+FROM ANIMAL_INS 
+WHERE ANIMAL_ID NOT IN(SELECT ANIMAL_ID FROM ANIMAL_OUTS)
+ORDER BY DATETIME asc
+LIMIT 3;
